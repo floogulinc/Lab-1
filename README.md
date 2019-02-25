@@ -91,25 +91,25 @@ the metaphor breaks down pretty quickly. But it's still a handy way to think abo
 
 Change to the database 'test':
 
-```
+```sql
 use test;
 ```
 
 See what tables are in that database:
 
-```
+```sql
 show tables;
 ```
 Look at the contents of database inventory (MariaDB IS case sensitive when it comes to table names-- be
 careful):
 
-```
+```sql
 select * from inventory;
 ```
 
 Get a sense for the structure of that database:
 
-```
+```sql
 describe inventory;
 ```
 
@@ -124,7 +124,7 @@ With that warning firmly in mind see if you can do the following:
 
 Now type the following:
 
-```
+```sql
 select user, host, password from user;
 ```
 
@@ -152,7 +152,7 @@ the `USE` command. It skips the `RENAME USER` command (which can be helpful).
 
 Let's start by seeing how to create your user with the following template as a guide:
 
-```
+```sql
 CREATE USER <name> IDENTIFIED BY '<password>';
 ```
 
@@ -165,7 +165,7 @@ Go ahead and give it a go with the name that you will use for your user.  Your n
 
 Look at your user's privileges like this:
 
-```
+```sql
 SHOW GRANTS FOR <name>;
 ```
 
@@ -181,7 +181,7 @@ I see something like this:
 
 Security in mySQL (and mariaDB) is managed through the use of scoped users and privileges.  Different privileges can be granted for users based upon their username AND the host from which they connect. The command I used to create `testy_pete`, could be written more explicitly as
 
-```
+```sql
 CREATE USER testy_pete@'%' IDENTIFIED BY 'let me in';
 ```
 
@@ -189,19 +189,19 @@ In this construction the username is of the form `<name>@<host>`.  Wild cards ca
 
 If you are running your system on a private IP in the `192.168.1.x` range you could use `192.168.1.%` for your host when you create your user.  Every machine in the dungeon has an IP address of the form `146.57.33.x`, so if I only wanted `testy_pete` to be able to use the database from the dungeon I could create the account thus:
 
-```
+```sql
 CREATE USER testy_pete@'146.57.33.%' IDENTIFIED BY 'let me in';
 ```
 
 Please note the use of single quotes – backticks can be used as well:
 
-```
+```sql
 CREATE USER testy_pete@`146.57.33.%` IDENTIFIED BY 'let me in';
 ```
 
 In just a second you are going to remove the user you just created, and make a new one that can only log in from the dungeon.  Before that take a second look at `mysql.user` while you are still logged in as tempadmin:
 
-```
+```sql
 select user, host, password from mysql.user;
 ```
 
@@ -209,7 +209,7 @@ select user, host, password from mysql.user;
 
 Now remove your user from the system:
 
-```
+```sql
 DROP USER <name>;
 ```
 
@@ -219,7 +219,7 @@ Now that you have removed your unrestricted account, re-add it with the appropri
 
 Have a look at how the user database has changed:
 
-```
+```sql
 select user, host, password from mysql.user;
 ```
 
@@ -230,7 +230,7 @@ the `DROP DATABASE <database name>` command.
 
 Create a database for your personal use.  Use the same name as your username.  My command would look something like this:
 
-```
+```sql
 CREATE DATABASE testy_pete;
 ```
 
@@ -260,7 +260,7 @@ There are MANY levels of access that are allowed. Most are fairly straightforwar
 
 Before doing anything else, have a look at what your new account can do.  Try the equivalent of the following with your new account:
 
-```
+```sql
 SHOW GRANTS for testy_pete;
 SHOW GRANTS for testy_pete@'146.57.33.%';
 ```
@@ -269,7 +269,7 @@ Your new username makes a few commands a bit more complicated.   See the differe
 
 To provide access use `GRANT`.  The basic usage is 
 
-```
+```sql
 GRANT <privs> ON <object> TO <user>
 ```
 
@@ -277,7 +277,7 @@ The privileges can be applied to all databases (`*.*`), to all tables in a datab
 
 The user can be scoped. So, for example
 
-```
+```sql
 GRANT SELECT on test.A to 'dummy'@'192.%';
 ```
 
@@ -289,7 +289,7 @@ the password for that scoped user might not be what you expect.
 
 You are going to want to give yourself full access to your new database.  Modify the following command:
 
-```
+```sql
 GRANT ALL ON testy_pete.* TO testy_pete@'146.57.33.%' WITH GRANT OPTION;
 ```
 
@@ -297,7 +297,7 @@ The keywords `WITH GRANT OPTION` will allow you the ability to provide privilege
 
 After you have given your new account appropriate access to your new database, you'll need to refresh the system:
 
-```
+```sql
 FLUSH PRIVILEGES;
 ```
 
